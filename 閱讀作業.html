@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="2025 世界書香日 - 自主閱讀趣，參與線上閱讀測驗，挑戰您的閱讀理解能力！">
+    <!-- Open Graph 標籤 (Facebook, LINE等) -->
+    <meta property="og:title" content="2025 世界書香日 - 自主閱讀趣">
+    <meta property="og:description" content="哈祐恆 在「AI應用—使用攻略」閱讀測驗中獲得了 1/7 (14%) 的成績！">
+    <meta property="og:url" content="https://ireading.tp.edu.tw/plugin/readbook2025/index.html">
+    <meta property="og:image" content="https://ireading.tp.edu.tw/images/share-preview.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="世界書香日">
+
+    <!-- Twitter Card 標籤 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="2025 世界書香日 - 自主閱讀趣">
+    <meta name="twitter:description" content="哈祐恆 在「AI應用—使用攻略」閱讀測驗中獲得了 1/7 (14%) 的成績！">
+    <meta name="twitter:image" content="https://ireading.tp.edu.tw/images/share-preview.jpg">
+
+    <title>測驗結果 - 2025 世界書香日</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 自定義Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#2196F3',
+                        danger: '#f44336',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-calendar-picker-indicator,
+        ::picker-icon {
+            background: none;
+            scale: 0;
+            position: absolute;
+        }
+
+        /* 滿版背景樣式 */
+        .bg-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.3s ease-in-out;
+        }
+
+        /* 背景圖片漸變效果 */
+        .bg-fullscreen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            /* 略微遮罩，提高文字對比度 */
+            z-index: -1;
+        }
+
+        /* 適合不同主題的過濾效果，可根據主題需要調整 */
+        #quizBackground.theme-topic1::before {
+            background-color: rgba(76, 175, 80, 0.2);
+        }
+
+        /* 綠色遮罩 */
+        #quizBackground.theme-topic2::before {
+            background-color: rgba(33, 150, 243, 0.2);
+        }
+
+        /* 藍色遮罩 */
+        #quizBackground.theme-topic3::before {
+            background-color: rgba(244, 67, 54, 0.2);
+        }
+
+        /* 紅色遮罩 */
+        /* 主頁背景 */
+        #indexBackground {
+            opacity: 1;
+        }
+
+        /* 測驗頁背景 */
+        #quizBackground {
+            background-color: #f7f9fc;
+            /* 預設背景色 */
+            background-image: url('https://ireading.tp.edu.tw/plugin/readbook2025/images/results-background.jpg');
+            /* 預設可替換為您的背景圖 */
+            opacity: 0.85;
+            /* 背景透明度 */
+        }
+
+        /* 結果頁背景 */
+        #resultsBackground {
+            background-color: #f7f9fc;
+            /* 預設背景色 */
+            background-image: url('https://ireading.tp.edu.tw/plugin/readbook2025/images/results-background.jpg');
+            /* 預設可替換為您的背景圖 */
+            opacity: 0.6;
+            /* 背景透明度 - 較淡以確保文字可讀性 */
+        }
+
+        /* 頁籤樣式 */
+        .tab-active {
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .tab-inactive {
+            color: #6B7280;
+            border-color: transparent;
+        }
+
+        /* 熱點懸停效果 */
+        #hotspot-container [id^="topic"] {
+            transition: all 0.3s ease;
+        }
+
+        #hotspot-container [id^="topic"]:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* 通知框動畫 */
+        .notification {
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* 主題統計條動畫 */
+        @keyframes growBar {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: var(--bar-width);
+            }
+        }
+
+        .topic-bar {
+            --bar-width: 0%;
+            width: var(--bar-width);
+            animation: growBar 1s ease-out forwards;
+        }
+
+        /* 排行榜條目動畫 */
+        .leaderboard-row {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Splash Screen 動畫效果 */
+        /* 基本淡出動畫 */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* 上下浮動動畫 - 用於標題和按鈕 */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 緩慢左右浮動動畫 - 用於 logoWorld */
+        @keyframes floatSideways {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(15px);
+            }
+        }
+
+        /* 旋轉浮動動畫 - 用於 logoReading */
+        @keyframes floatRotate {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(2deg);
+            }
+        }
+
+        /* Character 特殊動畫 - 結合縮放和小幅度浮動 */
+        @keyframes characterAnim {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            25% {
+                transform: translateY(-5px) scale(1.02);
+            }
+
+            75% {
+                transform: translateY(5px) scale(0.98);
+            }
+        }
+
+        /* 發光按鈕動畫 */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+                transform: scale(1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+                transform: scale(1.05);
+            }
+        }
+
+        /* 淡出後不再攔截滑鼠 */
+        #splashScreen.fade-out {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+
+        /* 應用動畫到不同元素 */
+        #logoWorld {
+            animation: floatSideways 6s ease-in-out infinite;
+            position: absolute;
+            top: 5vh;
+            left: 2vw;
+            width: auto;
+            height: auto;
+            max-height: 320px;
+            min-height: 80px;
+            z-index: 10;
+        }
+
+        #logoReading {
+            animation: floatRotate 8s ease-in-out infinite;
+            position: absolute;
+            top: 8vh;
+            right: 15vw;
+            width: auto;
+            height: 18vh;
+            max-height: 180px;
+            min-height: 100px;
+            z-index: 10;
+        }
+
+        #character {
+            animation: characterAnim 5s ease-in-out infinite;
+            position: absolute;
+            bottom: -1vh;
+            left: 5vw;
+            width: auto;
+            height: auto;
+            max-height: 400px;
+            min-height: 200px;
+            object-fit: contain;
+            z-index: 10;
+        }
+
+        #splashStartBtn {
+            position: absolute;
+            left: 50%;
+            bottom: 20vh;
+            transform: translateX(-50%);
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        #splashStartBtn:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        #splashStartBtn:focus {
+            outline: none;
+        }
+
+        #splashStartBtn img {
+            animation: glowPulse 3s ease-in-out infinite;
+            width: auto;
+            height: auto;
+            min-height: 80px;
+            max-height: 220px;
+        }
+
+        /* 背景漸層效果增強 */
+        .splash-overlay {
+            background: linear-gradient(135deg,
+                    rgba(0, 0, 0, 0.4) 0%,
+                    rgba(0, 0, 0, 0.2) 50%,
+                    rgba(0, 0, 0, 0.5) 100%);
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        /* 媒體查詢 - 小螢幕裝置適應 */
+        @media (max-width: 640px) {
+            #character {
+                height: auto;
+                bottom: -1vh;
+                left: 2vw;
+            }
+
+            #logoWorld {
+                height: auto;
+                top: 3vh;
+                left: -1vw;
+            }
+
+            #logoReading {
+                height: 14vh;
+                top: 5vh;
+                right: 7vw;
+            }
+
+            #splashStartBtn {
+                top: 12vh;
+            }
+
+            #splashStartBtn img {
+                height: auto;
+            }
+        }
+
+        /* 媒體查詢 - 大螢幕裝置適應 */
+        @media (min-width: 1280px) {
+            #character {
+                max-height: 52vh;
+            }
+
+            #logoWorld,
+            #logoReading {
+                max-height: 320px;
+            }
+        }
+
+        /* 處理超寬螢幕 */
+        @media (min-aspect-ratio: 16/9) {
+            #character {
+                height: 52vh;
+            }
+        }
+
+        .leaderboard-row:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .leaderboard-row:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .leaderboard-row:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .leaderboard-row:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .leaderboard-row:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .leaderboard-row:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .leaderboard-row:nth-child(7) {
+            animation-delay: 0.7s;
+        }
+
+        .leaderboard-row:nth-child(8) {
+            animation-delay: 0.8s;
+        }
+
+        .leaderboard-row:nth-child(9) {
+            animation-delay: 0.9s;
+        }
+
+        .leaderboard-row:nth-child(10) {
+            animation-delay: 1.0s;
+        }
+
+        .game-modal {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            border: 4px solid #4CAF50;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('images/game-pattern.png');
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .game-modal-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-title {
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-content {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #4CAF50;
+        }
+
+        .game-button {
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .game-button:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* 確保內容區域有適當的滾動效果 */
+        .game-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* 標籤頁樣式 */
+        #explanationTabBtn,
+        #creditsTabBtn {
+            transition: all 0.3s ease;
+        }
+
+        /* 滾動條樣式 */
+        .game-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .game-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .game-content::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 3px;
+        }
+
+        .game-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 175, 80, 0.7);
+        }
+
+        *,
+        ::before,
+        ::after {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        ::backdrop {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        /* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb
+        }
+
+        ::after,
+        ::before {
+            --tw-content: ''
+        }
+
+        :host,
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            margin: 0;
+            line-height: inherit
+        }
+
+        hr {
+            height: 0;
+            color: inherit;
+            border-top-width: 1px
+        }
+
+        abbr:where([title]) {
+            -webkit-text-decoration: underline dotted;
+            text-decoration: underline dotted
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: inherit;
+            font-weight: inherit
+        }
+
+        a {
+            color: inherit;
+            text-decoration: inherit
+        }
+
+        b,
+        strong {
+            font-weight: bolder
+        }
+
+        code,
+        kbd,
+        pre,
+        samp {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            font-size: 1em
+        }
+
+        small {
+            font-size: 80%
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        table {
+            text-indent: 0;
+            border-color: inherit;
+            border-collapse: collapse
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: inherit;
+            font-feature-settings: inherit;
+            font-variation-settings: inherit;
+            font-size: 100%;
+            font-weight: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0
+        }
+
+        button,
+        select {
+            text-transform: none
+        }
+
+        button,
+        input:where([type=button]),
+        input:where([type=reset]),
+        input:where([type=submit]) {
+            -webkit-appearance: button;
+            background-color: transparent;
+            background-image: none
+        }
+
+        :-moz-focusring {
+            outline: auto
+        }
+
+        :-moz-ui-invalid {
+            box-shadow: none
+        }
+
+        progress {
+            vertical-align: baseline
+        }
+
+        ::-webkit-inner-spin-button,
+        ::-webkit-outer-spin-button {
+            height: auto
+        }
+
+        [type=search] {
+            -webkit-appearance: textfield;
+            outline-offset: -2px
+        }
+
+        ::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+
+        ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            font: inherit
+        }
+
+        summary {
+            display: list-item
+        }
+
+        blockquote,
+        dd,
+        dl,
+        figure,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        hr,
+        p,
+        pre {
+            margin: 0
+        }
+
+        fieldset {
+            margin: 0;
+            padding: 0
+        }
+
+        legend {
+            padding: 0
+        }
+
+        menu,
+        ol,
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        dialog {
+            padding: 0
+        }
+
+        textarea {
+            resize: vertical
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            opacity: 1;
+            color: #9ca3af
+        }
+
+        [role=button],
+        button {
+            cursor: pointer
+        }
+
+        :disabled {
+            cursor: default
+        }
+
+        audio,
+        canvas,
+        embed,
+        iframe,
+        img,
+        object,
+        svg,
+        video {
+            display: block;
+            vertical-align: middle
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto
+        }
+
+        [hidden]:where(:not([hidden=until-found])) {
+            display: none
+        }
+
+        .container {
+            width: 100%
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                max-width: 640px
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1024px
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .container {
+                max-width: 1280px
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1536px
+            }
+        }
+
+        .fixed {
+            position: fixed
+        }
+
+        .absolute {
+            position: absolute
+        }
+
+        .relative {
+            position: relative
+        }
+
+        .bottom-8 {
+            bottom: 2rem
+        }
+
+        .left-0 {
+            left: 0px
+        }
+
+        .right-0 {
+            right: 0px
+        }
+
+        .right-24 {
+            right: 6rem
+        }
+
+        .right-8 {
+            right: 2rem
+        }
+
+        .top-0 {
+            top: 0px
+        }
+
+        .z-50 {
+            z-index: 50
+        }
+
+        .m-0 {
+            margin: 0px
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .my-2 {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem
+        }
+
+        .my-3 {
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem
+        }
+
+        .my-8 {
+            margin-top: 2rem;
+            margin-bottom: 2rem
+        }
+
+        .-mb-px {
+            margin-bottom: -1px
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem
+        }
+
+        .me-2 {
+            margin-inline-end: 0.5rem
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem
+        }
+
+        .ml-4 {
+            margin-left: 1rem
+        }
+
+        .mr-1 {
+            margin-right: 0.25rem
+        }
+
+        .mr-2 {
+            margin-right: 0.5rem
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem
+        }
+
+        .mt-4 {
+            margin-top: 1rem
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem
+        }
+
+        .mt-8 {
+            margin-top: 2rem
+        }
+
+        .block {
+            display: block
+        }
+
+        .inline-block {
+            display: inline-block
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .inline-flex {
+            display: inline-flex
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .h-24 {
+            height: 6rem
+        }
+
+        .h-full {
+            height: 100%
+        }
+
+        .max-h-\[70vh\] {
+            max-height: 70vh
+        }
+
+        .min-h-screen {
+            min-height: 100vh
+        }
+
+        .w-24 {
+            width: 6rem
+        }
+
+        .w-\[10\%\] {
+            width: 10%
+        }
+
+        .w-\[33\.3\%\] {
+            width: 33.3%
+        }
+
+        .w-\[50\%\] {
+            width: 50%
+        }
+
+        .w-\[66\.7\%\] {
+            width: 66.7%
+        }
+
+        .w-\[95\%\] {
+            width: 95%
+        }
+
+        .w-full {
+            width: 100%
+        }
+
+        .min-w-\[120px\] {
+            min-width: 120px
+        }
+
+        .min-w-\[150px\] {
+            min-width: 150px
+        }
+
+        .min-w-\[800px\] {
+            min-width: 800px
+        }
+
+        .max-w-4xl {
+            max-width: 56rem
+        }
+
+        .border-collapse {
+            border-collapse: collapse
+        }
+
+        .flex-col {
+            flex-direction: column
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-center {
+            justify-content: center
+        }
+
+        .justify-between {
+            justify-content: space-between
+        }
+
+        .justify-around {
+            justify-content: space-around
+        }
+
+        .gap-2 {
+            gap: 0.5rem
+        }
+
+        .gap-3 {
+            gap: 0.75rem
+        }
+
+        .gap-4 {
+            gap: 1rem
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto
+        }
+
+        .overflow-x-hidden {
+            overflow-x: hidden
+        }
+
+        .rounded {
+            border-radius: 0.25rem
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem
+        }
+
+        .rounded-md {
+            border-radius: 0.375rem
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem
+        }
+
+        .rounded-l-md {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem
+        }
+
+        .rounded-r {
+            border-top-right-radius: 0.25rem;
+            border-bottom-right-radius: 0.25rem
+        }
+
+        .rounded-r-md {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem
+        }
+
+        .rounded-t-lg {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem
+        }
+
+        .border {
+            border-width: 1px
+        }
+
+        .border-2 {
+            border-width: 2px
+        }
+
+        .border-b {
+            border-bottom-width: 1px
+        }
+
+        .border-b-2 {
+            border-bottom-width: 2px
+        }
+
+        .border-l-4 {
+            border-left-width: 4px
+        }
+
+        .border-none {
+            border-style: none
+        }
+
+        .border-blue-600 {
+            --tw-border-opacity: 1;
+            border-color: rgb(37 99 235 / var(--tw-border-opacity, 1))
+        }
+
+        .border-gray-200 {
+            --tw-border-opacity: 1;
+            border-color: rgb(229 231 235 / var(--tw-border-opacity, 1))
+        }
+
+        .border-gray-300 {
+            --tw-border-opacity: 1;
+            border-color: rgb(209 213 219 / var(--tw-border-opacity, 1))
+        }
+
+        .border-green-500 {
+            --tw-border-opacity: 1;
+            border-color: rgb(34 197 94 / var(--tw-border-opacity, 1))
+        }
+
+        .border-transparent {
+            border-color: transparent
+        }
+
+        .bg-gray-50 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#00b900\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(0 185 0 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#1da1f2\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(29 161 242 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#3b5998\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(59 89 152 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-black\/70 {
+            background-color: rgb(0 0 0 / 0.7)
+        }
+
+        .bg-blue-50 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(239 246 255 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-blue-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-danger {
+            --tw-bg-opacity: 1;
+            background-color: rgb(244 67 54 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-gray-100 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-gray-200 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-gray-500 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(107 114 128 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-green-50 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(240 253 244 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-pink-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(219 39 119 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-primary {
+            --tw-bg-opacity: 1;
+            background-color: rgb(76 175 80 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-secondary {
+            --tw-bg-opacity: 1;
+            background-color: rgb(33 150 243 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-white {
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1))
+        }
+
+        .p-0 {
+            padding: 0px
+        }
+
+        .p-2 {
+            padding: 0.5rem
+        }
+
+        .p-3 {
+            padding: 0.75rem
+        }
+
+        .p-4 {
+            padding: 1rem
+        }
+
+        .p-6 {
+            padding: 1.5rem
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem
+        }
+
+        .py-5 {
+            padding-top: 1.25rem;
+            padding-bottom: 1.25rem
+        }
+
+        .text-left {
+            text-align: left
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .text-right {
+            text-align: right
+        }
+
+        .font-sans {
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 2rem
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem
+        }
+
+        .font-bold {
+            font-weight: 700
+        }
+
+        .font-medium {
+            font-weight: 500
+        }
+
+        .text-blue-500 {
+            --tw-text-opacity: 1;
+            color: rgb(59 130 246 / var(--tw-text-opacity, 1))
+        }
+
+        .text-blue-600 {
+            --tw-text-opacity: 1;
+            color: rgb(37 99 235 / var(--tw-text-opacity, 1))
+        }
+
+        .text-gray-500 {
+            --tw-text-opacity: 1;
+            color: rgb(107 114 128 / var(--tw-text-opacity, 1))
+        }
+
+        .text-gray-600 {
+            --tw-text-opacity: 1;
+            color: rgb(75 85 99 / var(--tw-text-opacity, 1))
+        }
+
+        .text-gray-700 {
+            --tw-text-opacity: 1;
+            color: rgb(55 65 81 / var(--tw-text-opacity, 1))
+        }
+
+        .text-gray-800 {
+            --tw-text-opacity: 1;
+            color: rgb(31 41 55 / var(--tw-text-opacity, 1))
+        }
+
+        .text-green-700 {
+            --tw-text-opacity: 1;
+            color: rgb(21 128 61 / var(--tw-text-opacity, 1))
+        }
+
+        .text-green-800 {
+            --tw-text-opacity: 1;
+            color: rgb(22 101 52 / var(--tw-text-opacity, 1))
+        }
+
+        .text-orange-500 {
+            --tw-text-opacity: 1;
+            color: rgb(249 115 22 / var(--tw-text-opacity, 1))
+        }
+
+        .text-primary {
+            --tw-text-opacity: 1;
+            color: rgb(76 175 80 / var(--tw-text-opacity, 1))
+        }
+
+        .text-secondary {
+            --tw-text-opacity: 1;
+            color: rgb(33 150 243 / var(--tw-text-opacity, 1))
+        }
+
+        .text-white {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .text-green-600 {
+            --tw-text-opacity: 1;
+            color: rgb(22 163 74 / var(--tw-text-opacity, 1))
+        }
+
+        .text-red-600 {
+            --tw-text-opacity: 1;
+            color: rgb(220 38 38 / var(--tw-text-opacity, 1))
+        }
+
+        .opacity-70 {
+            opacity: 0.7
+        }
+
+        .shadow-lg {
+            --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .shadow-md {
+            --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .shadow-sm {
+            --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .transition-colors {
+            transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .hover\:border-gray-300:hover {
+            --tw-border-opacity: 1;
+            border-color: rgb(209 213 219 / var(--tw-border-opacity, 1))
+        }
+
+        .hover\:bg-blue-600:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-blue-700:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-gray-300:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-gray-600:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(75 85 99 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-green-600:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(22 163 74 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-pink-700:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(190 24 93 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-red-700:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-gray-50:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-opacity-90:hover {
+            --tw-bg-opacity: 0.9
+        }
+
+        .hover\:text-gray-600:hover {
+            --tw-text-opacity: 1;
+            color: rgb(75 85 99 / var(--tw-text-opacity, 1))
+        }
+
+        .hover\:shadow-lg:hover {
+            --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        @media (min-width: 640px) {
+            .sm\:p-8 {
+                padding: 2rem
+            }
+        }
+
+        @media (min-width: 768px) {
+            .md\:table-cell {
+                display: table-cell
+            }
+
+            .md\:table-row {
+                display: table-row
+            }
+
+            .md\:w-\[10\%\] {
+                width: 10%
+            }
+
+            .md\:w-\[20\%\] {
+                width: 20%
+            }
+
+            .md\:flex-row {
+                flex-direction: row
+            }
+
+            .md\:p-6 {
+                padding: 1.5rem
+            }
+
+            .md\:p-8 {
+                padding: 2rem
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:max-w-6xl {
+                max-width: 72rem
+            }
+        }
+
+        .td-date {
+            border: none;
+            padding: 0;
+            outline: none;
+            text-align: center;
+            font-size: 15.5px;
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .td-time {
+            border: none;
+            padding: 0;
+            outline: none;
+            text-align: center;
+            font-size: 15.5px;
+            font-weight: 500;
+            letter-spacing: 0;
+            margin: 0;
+            width: 45px;
+        }
+    </style>
+</head>
+
+<body class="m-0 p-0 min-h-screen font-sans bg-gray-50 overflow-x-hidden">
+    <!-- 滿版背景 -->
+    <div class="bg-fullscreen" id="resultsBackground" style="background-color: rgb(239, 235, 233);"></div>
+
+    <div class="container relative w-full max-w-4xl mx-auto p-4 md:p-6 lg:max-w-6xl my-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8 relative">
+            <div class="relative mb-8 text-center">
+                <button
+                    class="absolute top-0 left-0 bg-gray-200 hover:bg-gray-300 border-none rounded-md p-2 flex items-center gap-2 text-sm transition-all">
+                    <i class="fas fa-home"></i> 返回首頁
+                </button>
+                <!-- 新增的測驗說明按鈕 -->
+                <div>
+                    <button id="quizHelpBtn"
+                        class="absolute top-0 right-0 bg-blue-600 hover:bg-blue-700 border-none rounded-md p-2 flex items-center gap-2 text-white text-sm transition-all">
+                        <i class="fas fa-gamepad"></i> 測驗說明
+                    </button>
+                    <button id="creditsBtn"
+                        class="absolute top-0 right-24 me-2 bg-pink-600 hover:bg-pink-700 border-none rounded-md p-2 flex items-center gap-2 text-white text-sm transition-all">
+                        <i class="fas fa-heart"></i> 致謝名單
+                    </button>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">2025 世界書香日 - 自主閱讀趣 || 成績排行</h2>
+                <p id="resultDescription" class="text-gray-600 mt-2">這是一個幫你完成作業的網站</p>
+            </div>
+
+            <!-- 成就證書 -->
+            <div class="relative bg-gray-50 border-2 border-gray-200 rounded-lg p-6 md:p-8 mb-8 text-center">
+                <h3 class="text-xl font-bold text-gray-700">網站使用說明</h3>
+                <p class="my-3">點擊<span class="text-green-600">勾勾</span> / <span
+                        class="text-red-600">叉叉</span>來改變是否完成<br>時間日期也可點擊更改<br>每排的最後一個勾勾要保留，除非那排全都沒有</p>
+                <p class="my-2 text-gray-500">日期的長的有點不一樣</p>
+
+                <div class="absolute right-8 bottom-8 w-24 h-24 opacity-70">
+                    <img src="https://ireading.tp.edu.tw/plugin/readbook2025/images/certificate-stamp.png" alt="證書章"
+                        class="w-full h-full">
+                </div>
+            </div>
+
+            <!-- 分數摘要 -->
+            <div class="flex flex-wrap justify-around bg-blue-50 rounded-lg py-5 px-4 mb-8">
+                <div class="text-center p-3 min-w-[120px]">
+                    <div class="text-gray-600 text-sm mb-1">得分</div>
+                    <div id="scoreDisplay" class="text-2xl font-bold text-gray-800">-</div>
+                </div>
+                <div class="text-center p-3 min-w-[120px]">
+                    <div class="text-gray-600 text-sm mb-1">百分比</div>
+                    <div id="percentageDisplay" class="text-2xl font-bold text-gray-800">-</div>
+                </div>
+                <div class="text-center p-3 min-w-[120px]">
+                    <div class="text-gray-600 text-sm mb-1">花費時間</div>
+                    <div id="timeDisplay" class="text-2xl font-bold text-gray-800">-</div>
+                </div>
+                <div class="text-center p-3 min-w-[120px]">
+                    <div class="text-gray-600 text-sm mb-1">排名</div>
+                    <div id="rankDisplay" class="text-2xl font-bold text-gray-800">-</div>
+                </div>
+            </div>
+
+            <!-- 祝賀訊息 -->
+            <div id="congratsMessage" class="bg-green-50 border-l-4 border-green-500 p-4 mb-8 rounded-r">
+                <h3 class="text-lg font-bold text-green-800 mb-1">恭喜完成!</h3>
+                <p class="text-green-700">您已完成本主題的閱讀測驗，可以繼續嘗試其他主題或重新挑戰此主題！</p>
+            </div>
+
+            <!-- 頁籤 -->
+            <div class="border-b border-gray-200 mb-6">
+                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+                    <li class="mr-2" role="presentation">
+                        <button class="tab-active inline-block p-4 border-b-2 rounded-t-lg" data-tab="personal"
+                            role="tab">
+                            個人成績
+                        </button>
+                    </li>
+                    <li class="mr-2" role="presentation">
+                        <button
+                            class="tab-inactive inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300"
+                            data-tab="leaderboard" role="tab">
+                            排行榜
+                        </button>
+                    </li><!-- 
+                    <li role="presentation">
+                        <button class="tab-inactive inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="stats" role="tab">
+                            參與統計
+                        </button>
+                    </li> -->
+                </ul>
+            </div>
+
+            <!-- 頁籤內容：個人成績 -->
+            <div class="tab-content block" data-content="personal">
+                <h3 class="text-lg font-bold text-gray-700 mb-4">您的閱讀測驗成績</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th rowspan="2"
+                                    class="py-3 px-4 border border-gray-300 text-center w-20%] md:w-[20%] w-[66.7%] min-w-[150px]">
+                                    主題</th>
+                                <th colspan="7"
+                                    class="py-3 px-4 border border-gray-300 text-center w-[50%] hidden md:table-cell">題號
+                                </th>
+                                <th rowspan="2"
+                                    class="py-3 px-4 border border-gray-300 text-center w-[10%] hidden md:table-cell">時間
+                                </th>
+                                <th rowspan="2"
+                                    class="py-3 px-4 border border-gray-300 text-center w-[10%] md:w-[10%] w-[33.3%]">得分
+                                </th>
+                                <th rowspan="2"
+                                    class="py-3 px-4 border border-gray-300 text-center w-[10%] hidden md:table-cell">日期
+                                </th>
+                            </tr>
+                            <tr class="bg-gray-50 hidden md:table-row">
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">1</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">2</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">3</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">4</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">5</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">6</th>
+                                <th class="py-2 px-4 border border-gray-300 text-center hidden md:table-cell">7</th>
+                            </tr>
+                        </thead>
+                        <tbody id="personalScoresTable">
+
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span>
+                                            <a">情緒學習—自我覺察</a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span><a>情緒學習—人際互動</a></span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01" maxlength="5">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span>
+                                            <a">情緒學習—自我管理</a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span><a>多元文化—異國節慶</a></span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span><a>多元文化—在地特色</a></span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span>
+                                            <a">多元文化—求知之旅</a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span><a>AI應用—無處不在</a></span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span>
+                                            <a">AI應用—虛實之間</a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-primary"><i class="fas fa-book"></i></span>
+                                        <span>
+                                            <a">AI應用—使用攻略</a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td
+                                    class="py-3 px-4 border-b text-center font-medium  hidden md:table-cell text-green-600 check">
+                                    <i class="fa-solid fa-check"></i>
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="text" value="01:00" class="td-time" maxlength="5">
+                                </td>
+                                <td class="py-3 px-4 border-b text-center font-medium text-green-600 score">7 / 7 (100%)
+                                </td>
+                                <td class="py-3 px-4 border-b text-center hidden md:table-cell">
+                                    <input type="date" class="td-date" value="2025-07-01">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-center gap-4 mt-8">
+                    <button id="restartBtn"
+                        class="bg-primary text-white py-3 px-6 rounded-md shadow-md hover:shadow-lg hover:bg-green-600 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-redo"></i> 重新測驗
+                    </button>
+                    <button id="nextTopicBtn"
+                        class="bg-secondary text-white py-3 px-6 rounded-md shadow-md hover:shadow-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-right"></i> 下一主題
+                    </button>
+                    <button
+                        class="bg-gray-500 text-white py-3 px-6 rounded-md shadow-md hover:shadow-lg hover:bg-gray-600 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-home"></i> 返回首頁
+                    </button>
+                </div>
+                <div class="flex flex-col md:flex-row justify-center gap-4 mt-8">
+                    <button id="uploadBtn"
+                        class="bg-secondary text-white py-2 px-6 rounded hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-upload mr-2"></i>成績上傳排行榜
+                    </button>
+                    <button id="clearRecordBtn"
+                        class="bg-danger text-white py-3 px-6 rounded-md shadow-md hover:shadow-lg hover:bg-red-700 transition-all flex items-center justify-center gap-2"><i
+                            class="fa-solid fa-trash"></i> 清除所有成績</button>
+                </div>
+            </div>
+
+            <!-- 分享選項 -->
+            <div class="mt-8 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-700 mb-3">快來分享您的成績！邀請更多人共享閱讀趣。</h3>
+                <div class="flex flex-wrap gap-3">
+                    <button id="shareFacebook"
+                        class="bg-[#3b5998] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90 transition-all">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                    <button id="shareTwitter"
+                        class="bg-[#1da1f2] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90 transition-all">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </button>
+                    <button id="shareLine"
+                        class="bg-[#00b900] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90 transition-all">
+                        <i class="fab fa-line"></i> LINE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 測驗說明 Modal -->
+    <div id="quizHelpModal"
+        class="fixed top-0 left-0 w-full h-full bg-black/70 flex justify-center items-center z-50 hidden">
+        <div class="game-modal w-[95%] max-w-4xl p-6 sm:p-8 rounded-lg">
+            <div class="game-modal-content">
+                <!-- 標籤頁切換按鈕 -->
+                <div class="flex mb-4 border-b border-gray-200">
+                    <button id="creditsTabBtn" class="py-2 px-4 text-gray-500 font-medium">
+                        致謝名單
+                    </button>
+                    <button id="explanationTabBtn"
+                        class="py-2 px-4 text-blue-600 border-b-2 border-blue-600 font-medium">
+                        測驗說明
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const checkClassIds = document.getElementsByClassName("check");
+        const scordClassIds = document.getElementsByClassName("score");
+
+        for (const i in checkClassIds) {
+            if (i === "length" || i === "item" || i === "namedItem") {
+                continue;
+            }
+
+            checkClassIds[i].addEventListener("click", function () {
+                let scoreColors = ["text-red-600", "text-red-600", "text-red-600", "text-red-600", "text-yellow-600", "text-blue-600", "text-blue-600", "text-green-600"]
+                let x = parseInt(scordClassIds[Math.floor(parseInt(i) / 7)].innerHTML.slice(0, 1));
+                if (window.getComputedStyle(checkClassIds[i]).color === "rgb(22, 163, 74)") {
+                    checkClassIds[i].classList.remove("text-green-600");
+                    checkClassIds[i].classList.add("text-red-600");
+                    checkClassIds[i].innerHTML = "<i class='fa-solid fa-xmark'></i>";
+                    scordClassIds[Math.floor(parseInt(i) / 7)].classList.remove(scoreColors[x])
+                    x -= 1;
+                } else {
+                    checkClassIds[i].classList.add("text-green-600");
+                    checkClassIds[i].classList.remove("text-red-600");
+                    checkClassIds[i].innerHTML = "<i class='fa-solid fa-check'></i>";
+                    scordClassIds[Math.floor(parseInt(i) / 7)].classList.remove(scoreColors[x])
+                    x += 1;
+                }
+
+                scordClassIds[Math.floor(parseInt(i) / 7)].innerHTML = `${x} / 7 (${Math.round(x / 7 * 100)}%)`;
+                scordClassIds[Math.floor(parseInt(i) / 7)].classList.add(scoreColors[x])
+            })
+        }
+    </script>
+</body>
+
+</html>
